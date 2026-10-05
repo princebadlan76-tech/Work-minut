@@ -3,3 +3,6 @@ uvicorn[standard]
 python-multipart
 pandas
 openpyxl
+pypdf
+python-docx
+pillow
