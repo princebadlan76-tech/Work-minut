@@ -43,13 +43,32 @@ async def extract_file_content(file: UploadFile):
 
     # Excel
     if filename.endswith((".xlsx", ".xls")):
-        df = pd.read_excel(BytesIO(content))
+    df = pd.read_excel(BytesIO(content))
 
-        return {
-            "file_type": "excel",
-            "columns": df.columns.tolist(),
-            "rows": df.fillna("").to_dict(orient="records")
-        }
+    # Remove completely empty rows and columns
+    df = df.dropna(axis=0, how="all")
+    df = df.dropna(axis=1, how="all")
+
+    # Remove Excel "Unnamed" columns
+    df = df.loc[
+        :,
+        ~df.columns.astype(str).str.startswith("Unnamed")
+    ]
+
+    # Clean column names
+    df.columns = [
+        str(column).strip()
+        for column in df.columns
+    ]
+
+    # Replace empty values
+    df = df.fillna("")
+
+    return {
+        "file_type": "excel",
+        "columns": df.columns.tolist(),
+        "rows": df.to_dict(orient="records")
+    }
 
     # CSV
     if filename.endswith(".csv"):
