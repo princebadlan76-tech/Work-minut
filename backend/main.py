@@ -5,11 +5,13 @@ import pandas as pd
 from pypdf import PdfReader
 from docx import Document
 
+
 app = FastAPI(
     title="Work Minut API",
     description="AI Data Entry Backend",
     version="1.0.0"
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -43,35 +45,38 @@ async def extract_file_content(file: UploadFile):
 
     # Excel
     if filename.endswith((".xlsx", ".xls")):
+
         df = pd.read_excel(BytesIO(content))
 
-       # Remove completely empty rows and columns
-       df = df.dropna(axis=0, how="all")
-       df = df.dropna(axis=1, how="all")
+        # Remove completely empty rows and columns
+        df = df.dropna(axis=0, how="all")
+        df = df.dropna(axis=1, how="all")
 
-       # Remove Excel "Unnamed" columns
-       df = df.loc[
-           :,
-           ~df.columns.astype(str).str.startswith("Unnamed")
-       ]
+        # Remove Excel "Unnamed" columns
+        df = df.loc[
+            :,
+            ~df.columns.astype(str).str.startswith("Unnamed")
+        ]
 
-       # Clean column names
-       df.columns = [
-           str(column).strip()
-           for column in df.columns
-       ]
- 
-       # Replace empty values
-       df = df.fillna("")
- 
-       return {
-           "file_type": "excel",
-           "columns": df.columns.tolist(),
-           "rows": df.to_dict(orient="records")
-       }
+        # Clean column names
+        df.columns = [
+            str(column).strip()
+            for column in df.columns
+        ]
+
+        # Replace empty values
+        df = df.fillna("")
+
+        return {
+            "file_type": "excel",
+            "columns": df.columns.tolist(),
+            "rows": df.to_dict(orient="records")
+        }
+
 
     # CSV
     if filename.endswith(".csv"):
+
         df = pd.read_csv(BytesIO(content))
 
         return {
@@ -80,8 +85,10 @@ async def extract_file_content(file: UploadFile):
             "rows": df.fillna("").to_dict(orient="records")
         }
 
+
     # PDF
     if filename.endswith(".pdf"):
+
         reader = PdfReader(BytesIO(content))
 
         pages = []
@@ -96,8 +103,10 @@ async def extract_file_content(file: UploadFile):
             "text": "\n".join(pages)
         }
 
+
     # Word
     if filename.endswith((".docx", ".doc")):
+
         document = Document(BytesIO(content))
 
         paragraphs = [
@@ -111,6 +120,8 @@ async def extract_file_content(file: UploadFile):
             "text": "\n".join(paragraphs)
         }
 
+
+    # Unsupported file
     return {
         "file_type": "unknown",
         "message": "This file format is not supported yet."
