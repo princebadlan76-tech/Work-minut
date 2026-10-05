@@ -1,0 +1,151 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+  min-height: 100vh;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px 6%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.badge {
+  background: #2563eb;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.hero {
+  max-width: 900px;
+  margin: 70px auto 30px;
+  padding: 20px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 42px;
+  margin-bottom: 15px;
+}
+
+.hero h1 span {
+  color: #2563eb;
+}
+
+.hero p {
+  color: #6b7280;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+.upload-box {
+  max-width: 650px;
+  margin: 35px auto;
+  background: white;
+  border: 2px dashed #cbd5e1;
+  border-radius: 18px;
+  padding: 45px 25px;
+  text-align: center;
+}
+
+.upload-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+}
+
+.upload-box h2 {
+  margin-bottom: 10px;
+}
+
+.upload-box p {
+  color: #6b7280;
+  margin-bottom: 25px;
+}
+
+.upload-btn {
+  display: inline-block;
+  background: #2563eb;
+  color: white;
+  padding: 13px 25px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.upload-btn:hover {
+  background: #1d4ed8;
+}
+
+#fileInput {
+  display: none;
+}
+
+#fileName {
+  margin-top: 20px;
+  color: #2563eb;
+  font-weight: 700;
+}
+
+.features {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.feature {
+  background: white;
+  padding: 25px;
+  border-radius: 14px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.feature-icon {
+  font-size: 30px;
+}
+
+.feature h3 {
+  margin: 12px 0 8px;
+}
+
+.feature p {
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+footer {
+  text-align: center;
+  padding: 30px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+@media (max-width: 650px) {
+  .hero h1 {
+    font-size: 32px;
+  }
+
+  .features {
+    grid-template-columns: 1fr;
+  }
+}
