@@ -2,24 +2,23 @@ const fileInput = document.getElementById("fileInput");
 const fileName = document.getElementById("fileName");
 
 const resultBox = document.getElementById("resultBox");
-const resultStatus = document.getElementById("resultStatus");
 const resultContent = document.getElementById("resultContent");
+const statusText = document.getElementById("statusText");
 
 const API_URL = "https://work-minut.onrender.com";
 
 fileInput.addEventListener("change", async function () {
 
   if (!this.files.length) {
-    fileName.textContent = "";
     return;
   }
 
   const file = this.files[0];
 
-  fileName.textContent = "⏳ Processing: " + file.name;
+  fileName.textContent = "Selected: " + file.name;
 
   resultBox.style.display = "block";
-  resultStatus.textContent = "⏳ Extracting data...";
+  statusText.textContent = "Processing...";
   resultContent.innerHTML = "";
 
   const formData = new FormData();
@@ -35,12 +34,19 @@ fileInput.addEventListener("change", async function () {
     const result = await response.json();
 
     if (!result.success) {
-      throw new Error(result.error || "Processing failed");
+
+      statusText.textContent = "Failed";
+
+      resultContent.innerHTML = `
+        <div class="error-message">
+          ${result.error || "Unable to process file."}
+        </div>
+      `;
+
+      return;
     }
 
-    fileName.textContent = "✅ Processed: " + file.name;
-
-    resultStatus.textContent = "✅ Data extracted successfully";
+    statusText.textContent = "Completed";
 
     displayResult(result.data);
 
@@ -48,32 +54,32 @@ fileInput.addEventListener("change", async function () {
 
     console.error(error);
 
-    resultStatus.textContent =
-      "❌ " + error.message;
+    statusText.textContent = "Connection Error";
 
-    resultContent.innerHTML = "";
+    resultContent.innerHTML = `
+      <div class="error-message">
+        Unable to connect to Work Minut server.
+      </div>
+    `;
   }
 });
 
 
 function displayResult(data) {
 
-  // Excel / CSV
-  if (
-    (data.file_type === "excel" || data.file_type === "csv") &&
-    data.rows
-  ) {
+  if (data.file_type === "csv" || data.file_type === "excel") {
 
-    if (!data.rows.length) {
-      resultContent.innerHTML = "<p>No data found.</p>";
+    const columns = data.columns || [];
+    const rows = data.rows || [];
+
+    if (!columns.length) {
+      resultContent.innerHTML = "<p>No structured data found.</p>";
       return;
     }
 
-    const columns = data.columns;
-
     let table = `
       <div class="table-wrapper">
-        <table>
+        <table class="result-table">
           <thead>
             <tr>
     `;
@@ -88,7 +94,7 @@ function displayResult(data) {
           <tbody>
     `;
 
-    data.rows.forEach(row => {
+    rows.forEach(row => {
 
       table += "<tr>";
 
@@ -96,12 +102,12 @@ function displayResult(data) {
 
         const value = row[column] ?? "";
 
-        table += `
-          <td>${escapeHTML(String(value))}</td>
-        `;
+        table += `<td>${escapeHTML(String(value))}</td>`;
+
       });
 
       table += "</tr>";
+
     });
 
     table += `
@@ -116,12 +122,21 @@ function displayResult(data) {
   }
 
 
-  // PDF / Word
-  if (data.text) {
+  if (data.file_type === "pdf" || data.file_type === "word") {
 
     resultContent.innerHTML = `
-      <div class="text-result">
-        <pre>${escapeHTML(data.text)}</pre>
+      <div class="table-wrapper">
+        <p>
+          Text extracted successfully.
+        </p>
+
+        <pre style="
+          white-space: pre-wrap;
+          margin-top: 15px;
+          padding: 15px;
+          background: #f8fafc;
+          border-radius: 10px;
+        ">${escapeHTML(data.text || "")}</pre>
       </div>
     `;
 
@@ -130,7 +145,9 @@ function displayResult(data) {
 
 
   resultContent.innerHTML = `
-    <p>No structured data found.</p>
+    <div class="error-message">
+      ${escapeHTML(data.message || "Unsupported file format.")}
+    </div>
   `;
 }
 
@@ -138,9 +155,9 @@ function displayResult(data) {
 function escapeHTML(value) {
 
   return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
