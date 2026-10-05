@@ -3,14 +3,236 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Work Minut - AI Data Entry</title>
+
+  <title>Work Minut | AI Data Entry</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #111827;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .badge {
+      font-size: 13px;
+      background: #2563eb;
+      padding: 7px 12px;
+      border-radius: 20px;
+    }
+
+    .hero {
+      max-width: 900px;
+      margin: 70px auto 30px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 42px;
+      margin-bottom: 15px;
+    }
+
+    .hero h1 span {
+      color: #2563eb;
+    }
+
+    .hero p {
+      color: #6b7280;
+      font-size: 17px;
+      line-height: 1.6;
+    }
+
+    .upload-box {
+      max-width: 650px;
+      margin: 35px auto;
+      background: white;
+      border: 2px dashed #cbd5e1;
+      border-radius: 18px;
+      padding: 45px 25px;
+      text-align: center;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+    }
+
+    .upload-box h2 {
+      margin-bottom: 10px;
+    }
+
+    .upload-box p {
+      color: #6b7280;
+      margin-bottom: 25px;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 13px 25px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .upload-btn:hover {
+      background: #1d4ed8;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    #fileName {
+      margin-top: 20px;
+      color: #2563eb;
+      font-weight: bold;
+    }
+
+    .features {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+    }
+
+    .feature {
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    .feature h3 {
+      margin: 12px 0 8px;
+    }
+
+    .feature p {
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: #6b7280;
+      font-size: 14px;
+    }
+
+    @media (max-width: 650px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .features {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-  <h1>Work Minut</h1>
-  <p>AI-Powered Data Entry Tool</p>
+  <header>
+    <div class="logo">Work Minut</div>
+    <div class="badge">AI Data Entry</div>
+  </header>
 
-  <input type="file" id="fileInput">
+  <section class="hero">
+    <h1>Turn Any File Into <span>Structured Data</span></h1>
+
+    <p>
+      Upload your file and let Work Minut extract,
+      organize and prepare your data automatically.
+    </p>
+  </section>
+
+  <section class="upload-box">
+
+    <div class="upload-icon">📁</div>
+
+    <h2>Upload Your File</h2>
+
+    <p>
+      PDF, Excel, CSV, Word or Image
+    </p>
+
+    <label for="fileInput" class="upload-btn">
+      Choose File
+    </label>
+
+    <input
+      type="file"
+      id="fileInput"
+      accept=".pdf,.xlsx,.xls,.csv,.doc,.docx,.jpg,.jpeg,.png"
+    >
+
+    <div id="fileName"></div>
+
+  </section>
+
+  <section class="features">
+
+    <div class="feature">
+      <div>🤖</div>
+      <h3>AI Extraction</h3>
+      <p>Automatically extract useful information from uploaded files.</p>
+    </div>
+
+    <div class="feature">
+      <div>✅</div>
+      <h3>Quality Check</h3>
+      <p>Detect missing or suspicious data before final export.</p>
+    </div>
+
+    <div class="feature">
+      <div>📊</div>
+      <h3>Excel Ready</h3>
+      <p>Convert processed information into structured files.</p>
+    </div>
+
+  </section>
+
+  <footer>
+    © 2026 Work Minut — AI Data Entry Platform
+  </footer>
+
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const fileName = document.getElementById("fileName");
+
+    fileInput.addEventListener("change", function () {
+      if (this.files.length > 0) {
+        fileName.textContent = "Selected: " + this.files[0].name;
+      }
+    });
+  </script>
 
 </body>
 </html>
