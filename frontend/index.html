@@ -7,7 +7,6 @@
 
   <title>Work Minut | AI Data Entry</title>
 
-  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -20,7 +19,7 @@
   </header>
 
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <section class="hero">
 
     <h1>
@@ -30,13 +29,13 @@
 
     <p>
       Upload your file and let Work Minut extract,
-      organize and prepare your data automatically.
+      organize and quality-check your data automatically.
     </p>
 
   </section>
 
 
-  <!-- Upload Section -->
+  <!-- Upload -->
   <section class="upload-box">
 
     <div class="upload-icon">📁</div>
@@ -58,24 +57,26 @@
     >
 
     <div id="fileName"></div>
-    <div id="resultBox" class="result-box">
-  <div class="result-header">
-    <h2>Extracted Data</h2>
-    <span id="statusText">Waiting for file...</span>
-  </div>
 
-  <div id="resultContent"></div>
-    </div>
-    
-    <div id="resultBox" class="result-box" style="display: none;">
+  </section>
 
-  <h2>📊 Extracted Data</h2>
 
-  <div id="resultStatus"></div>
+  <!-- Result -->
+  <section id="resultBox" class="result-box">
 
-  <div id="resultContent"></div>
+    <div class="result-header">
+
+      <h2>Processed Data</h2>
+
+      <span id="statusText">
+        Waiting for file...
+      </span>
 
     </div>
+
+    <div id="qualityBox"></div>
+
+    <div id="resultContent"></div>
 
   </section>
 
@@ -84,38 +85,41 @@
   <section class="features">
 
     <div class="feature">
+
       <div class="feature-icon">🤖</div>
 
       <h3>AI Extraction</h3>
 
       <p>
-        Automatically extract useful information
-        from uploaded files.
+        Extract useful information from uploaded files.
       </p>
+
     </div>
 
 
     <div class="feature">
+
       <div class="feature-icon">✅</div>
 
       <h3>Quality Check</h3>
 
       <p>
-        Detect missing or suspicious data
-        before final export.
+        Detect missing or suspicious data before export.
       </p>
+
     </div>
 
 
     <div class="feature">
+
       <div class="feature-icon">📊</div>
 
-      <h3>Excel Ready</h3>
+      <h3>Structured Data</h3>
 
       <p>
-        Convert processed information
-        into structured files.
+        Convert extracted information into organized data.
       </p>
+
     </div>
 
   </section>
@@ -127,7 +131,6 @@
   </footer>
 
 
-  <!-- JavaScript -->
   <script src="script.js"></script>
 
 </body>
