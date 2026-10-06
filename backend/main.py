@@ -102,13 +102,18 @@ async def extract_file_content(file: UploadFile):
 
     # CSV
     if filename.endswith(".csv"):
-
         df = pd.read_csv(BytesIO(content))
 
+        columns = df.columns.tolist()
+        rows = df.fillna("").to_dict(orient="records")
+
+        quality = quality_check(columns, rows)
+
         return {
-            "file_type": "csv",
-            "columns": df.columns.tolist(),
-            "rows": df.fillna("").to_dict(orient="records")
+              "file_type": "csv",
+              "columns": columns,
+              "rows": rows,
+              "quality_check": quality
         }
 
 
