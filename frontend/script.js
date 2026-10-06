@@ -150,8 +150,6 @@ fileInput.addEventListener(
 );
 
 
-/* AI STATUS */
-
 function displayAI(ai) {
 
   if (!ai) {
@@ -166,11 +164,6 @@ function displayAI(ai) {
 
         ⚠ AI is not configured.
 
-        <br>
-
-        Add OPENAI_API_KEY
-        to Render Environment Variables.
-
       </div>
     `;
 
@@ -183,8 +176,7 @@ function displayAI(ai) {
     aiStatus.innerHTML = `
       <div class="ai-status ai-disabled">
 
-        AI processing failed:
-        ${escapeHTML(ai.error)}
+        AI processing failed.
 
       </div>
     `;
@@ -202,6 +194,8 @@ function displayAI(ai) {
 
       🤖 AI Extraction Completed
 
+      &nbsp;
+
       <strong>
         Quality Score: ${score}/100
       </strong>
@@ -210,8 +204,6 @@ function displayAI(ai) {
   `;
 }
 
-
-/* QUALITY */
 
 function displayQuality(
   quality
@@ -276,25 +268,9 @@ function displayQuality(
 }
 
 
-/* RESULT */
-
 function displayResult(
   data
 ) {
-
-  if (
-    data.file_type === "csv" ||
-    data.file_type === "excel"
-  ) {
-
-    displayTable(
-      data.columns || [],
-      data.rows || []
-    );
-
-    return;
-  }
-
 
   const ai =
     data.ai_extraction;
@@ -311,6 +287,20 @@ function displayResult(
     displayTable(
       ai.columns,
       ai.rows
+    );
+
+    return;
+  }
+
+
+  if (
+    data.file_type === "csv" ||
+    data.file_type === "excel"
+  ) {
+
+    displayTable(
+      data.columns || [],
+      data.rows || []
     );
 
     return;
@@ -353,8 +343,6 @@ function displayResult(
   `;
 }
 
-
-/* TABLE */
 
 function displayTable(
   columns,
@@ -449,8 +437,6 @@ function displayTable(
     table;
 }
 
-
-/* SECURITY */
 
 function escapeHTML(
   value
