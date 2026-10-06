@@ -2,136 +2,193 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Work Minut | AI Data Entry</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <link rel="stylesheet" href="style.css">
+  <title>
+    Work Minut | AI Data Entry
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
+
 
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="logo">Work Minut</div>
-    <div class="badge">AI Data Entry</div>
-  </header>
+
+<header>
+
+  <div class="logo">
+    Work Minut
+  </div>
+
+  <div class="badge">
+    AI Data Entry
+  </div>
+
+</header>
 
 
-  <!-- Hero -->
-  <section class="hero">
+<section class="hero">
 
-    <h1>
-      Turn Any File Into
-      <span>Structured Data</span>
-    </h1>
+  <h1>
+    Turn Any File Into
+    <span>Structured Data</span>
+  </h1>
+
+  <p>
+    Upload your file and let Work Minut
+    extract, organize and quality-check
+    your data automatically.
+  </p>
+
+</section>
+
+
+<section class="upload-box">
+
+  <div class="upload-icon">
+    📁
+  </div>
+
+  <h2>
+    Upload Your File
+  </h2>
+
+  <p>
+    PDF, Excel, CSV or Word
+  </p>
+
+
+  <label
+    for="fileInput"
+    class="upload-btn"
+  >
+    Choose File
+  </label>
+
+
+  <input
+    type="file"
+    id="fileInput"
+    accept=".pdf,.xlsx,.xls,.csv,.doc,.docx"
+  >
+
+
+  <div id="fileName"></div>
+
+</section>
+
+
+<section
+  id="resultBox"
+  class="result-box"
+>
+
+
+  <div class="result-header">
+
+    <h2>
+      Processed Data
+    </h2>
+
+    <span id="statusText">
+      Waiting...
+    </span>
+
+  </div>
+
+
+  <div id="aiStatus"></div>
+
+
+  <div id="qualityBox"></div>
+
+
+  <div id="resultContent"></div>
+
+
+</section>
+
+
+<section class="features">
+
+
+  <div class="feature">
+
+    <div class="feature-icon">
+      🤖
+    </div>
+
+    <h3>
+      AI Extraction
+    </h3>
 
     <p>
-      Upload your file and let Work Minut extract,
-      organize and quality-check your data automatically.
+      Automatically identify and
+      structure useful information.
     </p>
 
-  </section>
+  </div>
 
 
-  <!-- Upload -->
-  <section class="upload-box">
+  <div class="feature">
 
-    <div class="upload-icon">📁</div>
+    <div class="feature-icon">
+      ✅
+    </div>
 
-    <h2>Upload Your File</h2>
+    <h3>
+      Quality Check
+    </h3>
 
     <p>
-      PDF, Excel, CSV, Word or Image
+      Detect missing and suspicious
+      information.
     </p>
 
-    <label for="fileInput" class="upload-btn">
-      Choose File
-    </label>
-
-    <input
-      type="file"
-      id="fileInput"
-      accept=".pdf,.xlsx,.xls,.csv,.doc,.docx,.jpg,.jpeg,.png"
-    >
-
-    <div id="fileName"></div>
-
-  </section>
+  </div>
 
 
-  <!-- Result -->
-  <section id="resultBox" class="result-box">
+  <div class="feature">
 
-    <div class="result-header">
-
-      <h2>Processed Data</h2>
-
-      <span id="statusText">
-        Waiting for file...
-      </span>
-
+    <div class="feature-icon">
+      📊
     </div>
 
-    <div id="qualityBox"></div>
+    <h3>
+      Structured Data
+    </h3>
 
-    <div id="resultContent"></div>
+    <p>
+      Transform extracted information
+      into organized tables.
+    </p>
 
-  </section>
-
-
-  <!-- Features -->
-  <section class="features">
-
-    <div class="feature">
-
-      <div class="feature-icon">🤖</div>
-
-      <h3>AI Extraction</h3>
-
-      <p>
-        Extract useful information from uploaded files.
-      </p>
-
-    </div>
+  </div>
 
 
-    <div class="feature">
-
-      <div class="feature-icon">✅</div>
-
-      <h3>Quality Check</h3>
-
-      <p>
-        Detect missing or suspicious data before export.
-      </p>
-
-    </div>
+</section>
 
 
-    <div class="feature">
+<footer>
 
-      <div class="feature-icon">📊</div>
+  © 2026 Work Minut —
+  AI Data Entry Platform
 
-      <h3>Structured Data</h3>
-
-      <p>
-        Convert extracted information into organized data.
-      </p>
-
-    </div>
-
-  </section>
+</footer>
 
 
-  <!-- Footer -->
-  <footer>
-    © 2026 Work Minut — AI Data Entry Platform
-  </footer>
-
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
 
