@@ -37,7 +37,33 @@ def health():
         "status": "healthy"
     }
 
+def quality_check(columns, rows):
 
+    issues = []
+
+    # Missing column names
+    for column in columns:
+        if not str(column).strip():
+            issues.append("A column has a missing name.")
+
+    # Empty values
+    for row_number, row in enumerate(rows, start=1):
+
+        for column in columns:
+
+            value = row.get(column, "")
+
+            if value is None or str(value).strip() == "":
+                issues.append(
+                    f"Missing value in row {row_number}, column '{column}'."
+                )
+
+    return {
+        "passed": len(issues) == 0,
+        "total_issues": len(issues),
+        "issues": issues[:50]
+    }
+    
 async def extract_file_content(file: UploadFile):
 
     content = await file.read()
