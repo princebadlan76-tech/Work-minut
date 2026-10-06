@@ -11,10 +11,14 @@ body {
   min-height: 100vh;
 }
 
+
+/* Header */
+
 header {
   background: #111827;
   color: white;
   padding: 18px 6%;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -31,6 +35,9 @@ header {
   border-radius: 20px;
   font-size: 13px;
 }
+
+
+/* Hero */
 
 .hero {
   max-width: 900px;
@@ -54,13 +61,19 @@ header {
   line-height: 1.6;
 }
 
+
+/* Upload */
+
 .upload-box {
   max-width: 650px;
   margin: 35px auto;
   background: white;
+
   border: 2px dashed #cbd5e1;
   border-radius: 18px;
+
   padding: 45px 25px;
+
   text-align: center;
 }
 
@@ -78,13 +91,21 @@ header {
   margin-bottom: 25px;
 }
 
+
+/* Upload button */
+
 .upload-btn {
   display: inline-block;
+
   background: #2563eb;
   color: white;
+
   padding: 13px 25px;
+
   border-radius: 10px;
+
   cursor: pointer;
+
   font-weight: 700;
 }
 
@@ -98,24 +119,174 @@ header {
 
 #fileName {
   margin-top: 20px;
+
   color: #2563eb;
+
   font-weight: 700;
 }
 
+
+/* Result */
+
+.result-box {
+  max-width: 1000px;
+
+  margin: 30px auto;
+
+  padding: 25px;
+
+  background: white;
+
+  border-radius: 18px;
+
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+  display: none;
+}
+
+.result-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 20px;
+
+  gap: 15px;
+}
+
+.result-header h2 {
+  font-size: 22px;
+}
+
+#statusText {
+  font-size: 14px;
+
+  color: #2563eb;
+}
+
+
+/* Quality Check */
+
+.quality-box {
+  padding: 15px;
+
+  border-radius: 10px;
+
+  margin-bottom: 20px;
+
+  font-size: 14px;
+}
+
+.quality-pass {
+  background: #ecfdf5;
+
+  color: #047857;
+
+  border: 1px solid #a7f3d0;
+}
+
+.quality-warning {
+  background: #fff7ed;
+
+  color: #c2410c;
+
+  border: 1px solid #fed7aa;
+}
+
+.quality-box ul {
+  margin-top: 10px;
+
+  padding-left: 20px;
+}
+
+
+/* Table */
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+.result-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 500px;
+}
+
+.result-table th,
+.result-table td {
+  padding: 12px;
+
+  border-bottom: 1px solid #e5e7eb;
+
+  text-align: left;
+}
+
+.result-table th {
+  background: #f8fafc;
+
+  font-weight: 700;
+}
+
+
+/* Text result */
+
+.text-result {
+  white-space: pre-wrap;
+
+  margin-top: 15px;
+
+  padding: 15px;
+
+  background: #f8fafc;
+
+  border-radius: 10px;
+
+  line-height: 1.6;
+}
+
+
+/* Error */
+
+.error-message {
+  color: #dc2626;
+
+  padding: 15px;
+
+  background: #fef2f2;
+
+  border-radius: 10px;
+}
+
+
+/* Features */
+
 .features {
   max-width: 900px;
+
   margin: 40px auto;
+
   padding: 20px;
+
   display: grid;
+
   grid-template-columns: repeat(3, 1fr);
+
   gap: 15px;
 }
 
 .feature {
   background: white;
+
   padding: 25px;
+
   border-radius: 14px;
+
   text-align: center;
+
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
@@ -129,18 +300,30 @@ header {
 
 .feature p {
   color: #6b7280;
+
   font-size: 14px;
+
   line-height: 1.5;
 }
 
+
+/* Footer */
+
 footer {
   text-align: center;
+
   padding: 30px;
+
   color: #6b7280;
+
   font-size: 14px;
 }
 
+
+/* Mobile */
+
 @media (max-width: 650px) {
+
   .hero h1 {
     font-size: 32px;
   }
@@ -148,59 +331,11 @@ footer {
   .features {
     grid-template-columns: 1fr;
   }
-}
-.result-box {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 25px;
-  background: white;
-  border-radius: 18px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-  display: none;
-}
 
-.result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  gap: 15px;
-}
+  .result-header {
+    flex-direction: column;
 
-.result-header h2 {
-  font-size: 22px;
-}
+    align-items: flex-start;
+  }
 
-#statusText {
-  font-size: 14px;
-  color: #2563eb;
-}
-
-.table-wrapper {
-  overflow-x: auto;
-}
-
-.result-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 500px;
-}
-
-.result-table th,
-.result-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-}
-
-.result-table th {
-  background: #f8fafc;
-  font-weight: 700;
-}
-
-.error-message {
-  color: #dc2626;
-  padding: 15px;
-  background: #fef2f2;
-  border-radius: 10px;
 }
