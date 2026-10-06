@@ -6,7 +6,6 @@ import os
 import json
 
 import pandas as pd
-
 from pypdf import PdfReader
 from docx import Document
 
@@ -20,7 +19,7 @@ from openai import OpenAI
 app = FastAPI(
     title="Work Minut API",
     description="AI Data Entry Platform",
-    version="2.0.0"
+    version="3.0.0"
 )
 
 
@@ -38,14 +37,14 @@ app.add_middleware(
 
 
 # ==================================================
-# OPENAI
+# AI CONFIG
 # ==================================================
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 OPENAI_MODEL = os.getenv(
     "OPENAI_MODEL",
-    "gpt-6-luna"
+    "gpt-5-mini"
 )
 
 client = None
@@ -66,7 +65,7 @@ def root():
     return {
         "success": True,
         "message": "Work Minut API is running",
-        "version": "2.0.0"
+        "version": "3.0.0"
     }
 
 
@@ -80,21 +79,20 @@ def health():
     return {
         "success": True,
         "status": "healthy",
-        "ai_enabled": client is not None
+        "ai_enabled": client is not None,
+        "model": OPENAI_MODEL
     }
 
 
 # ==================================================
-# BASIC QUALITY CHECK
+# QUALITY CHECK
 # ==================================================
 
 def quality_check(columns, rows):
 
     issues = []
 
-
-    # Check column names
-
+    # Missing column names
     for column in columns:
 
         if not str(column).strip():
@@ -104,8 +102,7 @@ def quality_check(columns, rows):
             )
 
 
-    # Check missing values
-
+    # Missing values
     for row_number, row in enumerate(
         rows,
         start=1
@@ -141,12 +138,11 @@ def quality_check(columns, rows):
 
         "issues":
             issues[:50]
-
     }
 
 
 # ==================================================
-# AI STRUCTURE EXTRACTION
+# AI EXTRACTION
 # ==================================================
 
 def ai_extract_data(text):
@@ -154,43 +150,46 @@ def ai_extract_data(text):
     if not client:
 
         return {
+
             "enabled": False,
+
             "message":
-                "AI is not configured. "
-                "Add OPENAI_API_KEY in Render."
+                "AI is not configured."
         }
 
-
-    # Protect the API from extremely large input
 
     text = text[:50000]
 
 
     prompt = f"""
-You are the AI extraction engine for Work Minut,
-a professional data-entry platform.
+You are the AI extraction engine for Work Minut.
 
-Your job is to analyze the supplied document text
-and convert useful information into structured data.
+Work Minut is a professional data-entry platform.
+
+Analyze the supplied document and convert useful
+information into structured data.
 
 Rules:
 
-1. Identify the important fields in the document.
+1. Identify important fields.
 2. Create clear column names.
-3. Extract only information actually present.
-4. Never invent values.
-5. If a value is missing, use an empty string.
-6. Keep dates, phone numbers, emails and amounts
-   as accurately as possible.
-7. Remove obvious formatting noise.
+3. Extract only information present in the document.
+4. Never invent information.
+5. Missing information must be an empty string.
+6. Preserve names, emails, phone numbers, dates,
+   addresses and amounts accurately.
+7. Remove unnecessary formatting noise.
 8. Return valid JSON only.
-9. Include a quality score from 0 to 100.
-10. Explain important extraction issues.
+9. Give a quality score from 0 to 100.
+10. List important extraction issues.
 
-Return exactly this structure:
+Return exactly:
 
 {{
-  "columns": ["Column 1", "Column 2"],
+  "columns": [
+    "Column 1",
+    "Column 2"
+  ],
   "rows": [
     {{
       "Column 1": "value",
@@ -215,29 +214,59 @@ DOCUMENT:
         )
 
 
-        output = response.output_text
+        output = response.output_text.strip()
+
+
+        # Remove possible markdown fences
+        if output.startswith("```"):
+
+            output = (
+                output
+                .replace("```json", "")
+                .replace("```", "")
+                .strip()
+            )
 
 
         data = json.loads(output)
 
 
         return {
+
             "enabled": True,
+
             "columns":
-                data.get("columns", []),
+                data.get(
+                    "columns",
+                    []
+                ),
+
             "rows":
-                data.get("rows", []),
+                data.get(
+                    "rows",
+                    []
+                ),
+
             "quality_score":
-                data.get("quality_score", 0),
+                data.get(
+                    "quality_score",
+                    0
+                ),
+
             "issues":
-                data.get("issues", [])
+                data.get(
+                    "issues",
+                    []
+                )
         }
 
 
     except Exception as error:
 
         return {
+
             "enabled": True,
+
             "error":
                 str(error)
         }
@@ -270,11 +299,13 @@ async def extract_file_content(
             BytesIO(content)
         )
 
+
         columns = [
             str(column)
-            for column
-            in df.columns.tolist()
+            for column in
+            df.columns.tolist()
         ]
+
 
         rows = (
             df
@@ -284,14 +315,19 @@ async def extract_file_content(
             )
         )
 
+
         rows = [
+
             {
                 str(key): value
                 for key, value
                 in row.items()
             }
+
             for row in rows
+
         ]
+
 
         quality = quality_check(
             columns,
@@ -299,11 +335,12 @@ async def extract_file_content(
         )
 
 
-        # Convert table to text for AI
-
-        table_text = df.fillna("").to_csv(
-            index=False
+        table_text = (
+            df
+            .fillna("")
+            .to_csv(index=False)
         )
+
 
         ai_result = ai_extract_data(
             table_text
@@ -312,17 +349,20 @@ async def extract_file_content(
 
         return {
 
-            "file_type": "excel",
+            "file_type":
+                "excel",
 
-            "columns": columns,
+            "columns":
+                columns,
 
-            "rows": rows,
+            "rows":
+                rows,
 
-            "quality_check": quality,
+            "quality_check":
+                quality,
 
             "ai_extraction":
                 ai_result
-
         }
 
 
@@ -336,11 +376,13 @@ async def extract_file_content(
             BytesIO(content)
         )
 
+
         columns = [
             str(column)
-            for column
-            in df.columns.tolist()
+            for column in
+            df.columns.tolist()
         ]
+
 
         rows = (
             df
@@ -350,14 +392,19 @@ async def extract_file_content(
             )
         )
 
+
         rows = [
+
             {
                 str(key): value
                 for key, value
                 in row.items()
             }
+
             for row in rows
+
         ]
+
 
         quality = quality_check(
             columns,
@@ -365,8 +412,10 @@ async def extract_file_content(
         )
 
 
-        table_text = df.fillna("").to_csv(
-            index=False
+        table_text = (
+            df
+            .fillna("")
+            .to_csv(index=False)
         )
 
 
@@ -377,17 +426,20 @@ async def extract_file_content(
 
         return {
 
-            "file_type": "csv",
+            "file_type":
+                "csv",
 
-            "columns": columns,
+            "columns":
+                columns,
 
-            "rows": rows,
+            "rows":
+                rows,
 
-            "quality_check": quality,
+            "quality_check":
+                quality,
 
             "ai_extraction":
                 ai_result
-
         }
 
 
@@ -400,6 +452,7 @@ async def extract_file_content(
         reader = PdfReader(
             BytesIO(content)
         )
+
 
         pages = []
 
@@ -414,7 +467,9 @@ async def extract_file_content(
             pages.append(text)
 
 
-        full_text = "\n".join(pages)
+        full_text = "\n".join(
+            pages
+        )
 
 
         ai_result = ai_extract_data(
@@ -424,7 +479,8 @@ async def extract_file_content(
 
         return {
 
-            "file_type": "pdf",
+            "file_type":
+                "pdf",
 
             "pages":
                 len(pages),
@@ -434,7 +490,6 @@ async def extract_file_content(
 
             "ai_extraction":
                 ai_result
-
         }
 
 
@@ -475,14 +530,14 @@ async def extract_file_content(
 
         return {
 
-            "file_type": "word",
+            "file_type":
+                "word",
 
             "text":
                 full_text,
 
             "ai_extraction":
                 ai_result
-
         }
 
 
@@ -497,12 +552,11 @@ async def extract_file_content(
 
         "message":
             "This file format is not supported yet."
-
     }
 
 
 # ==================================================
-# UPLOAD
+# UPLOAD API
 # ==================================================
 
 @app.post("/api/upload")
@@ -521,14 +575,14 @@ async def upload_file(
 
         return {
 
-            "success": True,
+            "success":
+                True,
 
             "filename":
                 file.filename,
 
             "data":
                 extracted_data
-
         }
 
 
@@ -536,12 +590,12 @@ async def upload_file(
 
         return {
 
-            "success": False,
+            "success":
+                False,
 
             "filename":
                 file.filename,
 
             "error":
                 str(error)
-
         }
