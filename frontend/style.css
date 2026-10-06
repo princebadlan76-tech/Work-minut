@@ -4,72 +4,98 @@
   padding: 0;
 }
 
+
 body {
   font-family: Arial, sans-serif;
+
   background: #f5f7fb;
+
   color: #111827;
+
   min-height: 100vh;
 }
 
 
-/* Header */
+/* HEADER */
 
 header {
   background: #111827;
+
   color: white;
+
   padding: 18px 6%;
 
   display: flex;
+
   justify-content: space-between;
+
   align-items: center;
 }
 
+
 .logo {
   font-size: 24px;
+
   font-weight: 700;
 }
 
+
 .badge {
   background: #2563eb;
+
   padding: 7px 12px;
+
   border-radius: 20px;
+
   font-size: 13px;
 }
 
 
-/* Hero */
+/* HERO */
 
 .hero {
   max-width: 900px;
+
   margin: 70px auto 30px;
+
   padding: 20px;
+
   text-align: center;
 }
 
+
 .hero h1 {
   font-size: 42px;
+
   margin-bottom: 15px;
 }
+
 
 .hero h1 span {
   color: #2563eb;
 }
 
+
 .hero p {
   color: #6b7280;
+
   font-size: 17px;
+
   line-height: 1.6;
 }
 
 
-/* Upload */
+/* UPLOAD */
 
 .upload-box {
   max-width: 650px;
+
   margin: 35px auto;
+
   background: white;
 
   border: 2px dashed #cbd5e1;
+
   border-radius: 18px;
 
   padding: 45px 25px;
@@ -77,27 +103,31 @@ header {
   text-align: center;
 }
 
+
 .upload-icon {
   font-size: 48px;
+
   margin-bottom: 15px;
 }
+
 
 .upload-box h2 {
   margin-bottom: 10px;
 }
 
+
 .upload-box p {
   color: #6b7280;
+
   margin-bottom: 25px;
 }
 
-
-/* Upload button */
 
 .upload-btn {
   display: inline-block;
 
   background: #2563eb;
+
   color: white;
 
   padding: 13px 25px;
@@ -109,13 +139,16 @@ header {
   font-weight: 700;
 }
 
+
 .upload-btn:hover {
   background: #1d4ed8;
 }
 
+
 #fileInput {
   display: none;
 }
+
 
 #fileName {
   margin-top: 20px;
@@ -126,7 +159,7 @@ header {
 }
 
 
-/* Result */
+/* RESULT */
 
 .result-box {
   max-width: 1000px;
@@ -139,10 +172,13 @@ header {
 
   border-radius: 18px;
 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 4px 20px
+    rgba(0, 0, 0, 0.06);
 
   display: none;
 }
+
 
 .result-header {
   display: flex;
@@ -156,9 +192,11 @@ header {
   gap: 15px;
 }
 
+
 .result-header h2 {
   font-size: 22px;
 }
+
 
 #statusText {
   font-size: 14px;
@@ -167,7 +205,29 @@ header {
 }
 
 
-/* Quality Check */
+/* AI STATUS */
+
+.ai-status {
+  padding: 14px;
+
+  border-radius: 10px;
+
+  margin-bottom: 15px;
+
+  background: #eff6ff;
+
+  color: #1d4ed8;
+}
+
+
+.ai-disabled {
+  background: #fff7ed;
+
+  color: #c2410c;
+}
+
+
+/* QUALITY */
 
 .quality-box {
   padding: 15px;
@@ -179,6 +239,7 @@ header {
   font-size: 14px;
 }
 
+
 .quality-pass {
   background: #ecfdf5;
 
@@ -186,6 +247,7 @@ header {
 
   border: 1px solid #a7f3d0;
 }
+
 
 .quality-warning {
   background: #fff7ed;
@@ -195,6 +257,7 @@ header {
   border: 1px solid #fed7aa;
 }
 
+
 .quality-box ul {
   margin-top: 10px;
 
@@ -202,11 +265,12 @@ header {
 }
 
 
-/* Table */
+/* TABLE */
 
 .table-wrapper {
   overflow-x: auto;
 }
+
 
 .result-table {
   width: 100%;
@@ -216,14 +280,17 @@ header {
   min-width: 500px;
 }
 
+
 .result-table th,
 .result-table td {
   padding: 12px;
 
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom:
+    1px solid #e5e7eb;
 
   text-align: left;
 }
+
 
 .result-table th {
   background: #f8fafc;
@@ -232,24 +299,59 @@ header {
 }
 
 
-/* Text result */
+/* FEATURES */
 
-.text-result {
-  white-space: pre-wrap;
+.features {
+  max-width: 900px;
 
-  margin-top: 15px;
+  margin: 40px auto;
 
-  padding: 15px;
+  padding: 20px;
 
-  background: #f8fafc;
+  display: grid;
 
-  border-radius: 10px;
+  grid-template-columns:
+    repeat(3, 1fr);
 
-  line-height: 1.6;
+  gap: 15px;
 }
 
 
-/* Error */
+.feature {
+  background: white;
+
+  padding: 25px;
+
+  border-radius: 14px;
+
+  text-align: center;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0, 0, 0, 0.05);
+}
+
+
+.feature-icon {
+  font-size: 30px;
+}
+
+
+.feature h3 {
+  margin: 12px 0 8px;
+}
+
+
+.feature p {
+  color: #6b7280;
+
+  font-size: 14px;
+
+  line-height: 1.5;
+}
+
+
+/* ERROR */
 
 .error-message {
   color: #dc2626;
@@ -262,52 +364,7 @@ header {
 }
 
 
-/* Features */
-
-.features {
-  max-width: 900px;
-
-  margin: 40px auto;
-
-  padding: 20px;
-
-  display: grid;
-
-  grid-template-columns: repeat(3, 1fr);
-
-  gap: 15px;
-}
-
-.feature {
-  background: white;
-
-  padding: 25px;
-
-  border-radius: 14px;
-
-  text-align: center;
-
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-}
-
-.feature-icon {
-  font-size: 30px;
-}
-
-.feature h3 {
-  margin: 12px 0 8px;
-}
-
-.feature p {
-  color: #6b7280;
-
-  font-size: 14px;
-
-  line-height: 1.5;
-}
-
-
-/* Footer */
+/* FOOTER */
 
 footer {
   text-align: center;
@@ -320,7 +377,7 @@ footer {
 }
 
 
-/* Mobile */
+/* MOBILE */
 
 @media (max-width: 650px) {
 
