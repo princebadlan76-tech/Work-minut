@@ -9,7 +9,8 @@ import pandas as pd
 from pypdf import PdfReader
 from docx import Document
 
-from openai import OpenAI
+from google import genai
+from google.genai import types
 
 
 # ==================================================
@@ -19,7 +20,7 @@ from openai import OpenAI
 app = FastAPI(
     title="Work Minut API",
     description="AI Data Entry Platform",
-    version="3.0.0"
+    version="4.0.0"
 )
 
 
@@ -37,21 +38,21 @@ app.add_middleware(
 
 
 # ==================================================
-# AI CONFIG
+# GEMINI CONFIG
 # ==================================================
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-OPENAI_MODEL = os.getenv(
-    "OPENAI_MODEL",
-    "gpt-5-mini"
+GEMINI_MODEL = os.getenv(
+    "GEMINI_MODEL",
+    "gemini-2.5-flash"
 )
 
-client = None
+gemini_client = None
 
-if OPENAI_API_KEY:
-    client = OpenAI(
-        api_key=OPENAI_API_KEY
+if GEMINI_API_KEY:
+    gemini_client = genai.Client(
+        api_key=GEMINI_API_KEY
     )
 
 
@@ -65,7 +66,7 @@ def root():
     return {
         "success": True,
         "message": "Work Minut API is running",
-        "version": "3.0.0"
+        "version": "4.0.0"
     }
 
 
@@ -79,8 +80,8 @@ def health():
     return {
         "success": True,
         "status": "healthy",
-        "ai_enabled": client is not None,
-        "model": OPENAI_MODEL
+        "ai_enabled": gemini_client is not None,
+        "model": GEMINI_MODEL
     }
 
 
@@ -92,7 +93,10 @@ def quality_check(columns, rows):
 
     issues = []
 
+    # ----------------------------------------------
     # Missing column names
+    # ----------------------------------------------
+
     for column in columns:
 
         if not str(column).strip():
@@ -102,7 +106,10 @@ def quality_check(columns, rows):
             )
 
 
+    # ----------------------------------------------
     # Missing values
+    # ----------------------------------------------
+
     for row_number, row in enumerate(
         rows,
         start=1
@@ -142,48 +149,105 @@ def quality_check(columns, rows):
 
 
 # ==================================================
+# JSON CLEANER
+# ==================================================
+
+def clean_json_response(output):
+
+    output = output.strip()
+
+    # Remove markdown code fences
+    if output.startswith("```"):
+
+        output = (
+            output
+            .replace("```json", "")
+            .replace("```JSON", "")
+            .replace("```", "")
+            .strip()
+        )
+
+    # Find JSON object if extra text exists
+    start = output.find("{")
+    end = output.rfind("}")
+
+    if (
+        start != -1
+        and
+        end != -1
+    ):
+
+        output = output[
+            start:end + 1
+        ]
+
+    return output
+
+
+# ==================================================
 # AI EXTRACTION
 # ==================================================
 
 def ai_extract_data(text):
 
-    if not client:
+    # ----------------------------------------------
+    # AI NOT CONFIGURED
+    # ----------------------------------------------
+
+    if not gemini_client:
 
         return {
 
             "enabled": False,
 
             "message":
-                "AI is not configured."
+                "Gemini AI is not configured. "
+                "Add GEMINI_API_KEY in Render Environment."
         }
 
 
-    text = text[:50000]
+    # ----------------------------------------------
+    # Limit input size
+    # ----------------------------------------------
 
+    text = str(text)[:50000]
+
+
+    # ----------------------------------------------
+    # PROMPT
+    # ----------------------------------------------
 
     prompt = f"""
 You are the AI extraction engine for Work Minut.
 
 Work Minut is a professional data-entry platform.
 
-Analyze the supplied document and convert useful
-information into structured data.
+Analyze the supplied document or table and convert
+useful information into structured data.
 
-Rules:
+IMPORTANT RULES:
 
-1. Identify important fields.
-2. Create clear column names.
-3. Extract only information present in the document.
+1. Identify the important fields.
+2. Create clear and professional column names.
+3. Extract only information actually present.
 4. Never invent information.
 5. Missing information must be an empty string.
-6. Preserve names, emails, phone numbers, dates,
-   addresses and amounts accurately.
-7. Remove unnecessary formatting noise.
-8. Return valid JSON only.
-9. Give a quality score from 0 to 100.
-10. List important extraction issues.
+6. Preserve names accurately.
+7. Preserve emails accurately.
+8. Preserve phone numbers accurately.
+9. Preserve dates accurately.
+10. Preserve addresses accurately.
+11. Preserve amounts and numbers accurately.
+12. Remove unnecessary formatting noise.
+13. Keep the original meaning of the data.
+14. Return valid JSON only.
+15. Give a quality score from 0 to 100.
+16. List important extraction issues.
+17. If the supplied data is already a structured CSV/table,
+    preserve its useful columns and rows.
+18. Do not add explanations outside JSON.
 
-Return exactly:
+Return exactly this structure:
 
 {{
   "columns": [
@@ -200,7 +264,7 @@ Return exactly:
   "issues": []
 }}
 
-DOCUMENT:
+DOCUMENT / DATA:
 
 {text}
 """
@@ -208,27 +272,118 @@ DOCUMENT:
 
     try:
 
-        response = client.responses.create(
-            model=OPENAI_MODEL,
-            input=prompt
+        # ------------------------------------------
+        # GEMINI REQUEST
+        # ------------------------------------------
+
+        response = gemini_client.models.generate_content(
+
+            model=GEMINI_MODEL,
+
+            contents=prompt,
+
+            config=types.GenerateContentConfig(
+
+                temperature=0,
+
+                response_mime_type="application/json"
+
+            )
         )
 
 
-        output = response.output_text.strip()
+        # ------------------------------------------
+        # GET RESPONSE
+        # ------------------------------------------
+
+        output = (
+            response.text
+            if response.text
+            else ""
+        )
 
 
-        # Remove possible markdown fences
-        if output.startswith("```"):
+        output = clean_json_response(
+            output
+        )
 
-            output = (
-                output
-                .replace("```json", "")
-                .replace("```", "")
-                .strip()
+
+        # ------------------------------------------
+        # PARSE JSON
+        # ------------------------------------------
+
+        data = json.loads(
+            output
+        )
+
+
+        columns = data.get(
+            "columns",
+            []
+        )
+
+        rows = data.get(
+            "rows",
+            []
+        )
+
+        quality_score = data.get(
+            "quality_score",
+            0
+        )
+
+        issues = data.get(
+            "issues",
+            []
+        )
+
+
+        # ------------------------------------------
+        # VALIDATE TYPES
+        # ------------------------------------------
+
+        if not isinstance(
+            columns,
+            list
+        ):
+
+            columns = []
+
+
+        if not isinstance(
+            rows,
+            list
+        ):
+
+            rows = []
+
+
+        if not isinstance(
+            issues,
+            list
+        ):
+
+            issues = []
+
+
+        try:
+
+            quality_score = int(
+                quality_score
             )
 
+        except Exception:
 
-        data = json.loads(output)
+            quality_score = 0
+
+
+        quality_score = max(
+            0,
+            min(
+                100,
+                quality_score
+            )
+        )
 
 
         return {
@@ -236,28 +391,16 @@ DOCUMENT:
             "enabled": True,
 
             "columns":
-                data.get(
-                    "columns",
-                    []
-                ),
+                columns,
 
             "rows":
-                data.get(
-                    "rows",
-                    []
-                ),
+                rows,
 
             "quality_score":
-                data.get(
-                    "quality_score",
-                    0
-                ),
+                quality_score,
 
             "issues":
-                data.get(
-                    "issues",
-                    []
-                )
+                issues[:50]
         }
 
 
@@ -338,7 +481,9 @@ async def extract_file_content(
         table_text = (
             df
             .fillna("")
-            .to_csv(index=False)
+            .to_csv(
+                index=False
+            )
         )
 
 
@@ -415,7 +560,9 @@ async def extract_file_content(
         table_text = (
             df
             .fillna("")
-            .to_csv(index=False)
+            .to_csv(
+                index=False
+            )
         )
 
 
@@ -464,7 +611,9 @@ async def extract_file_content(
                 or ""
             )
 
-            pages.append(text)
+            pages.append(
+                text
+            )
 
 
         full_text = "\n".join(
