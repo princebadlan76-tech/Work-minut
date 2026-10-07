@@ -24,6 +24,10 @@ const API_URL =
   "https://work-minut.onrender.com";
 
 
+// ==================================================
+// FILE UPLOAD
+// ==================================================
+
 fileInput.addEventListener(
   "change",
   async function () {
@@ -57,8 +61,11 @@ fileInput.addEventListener(
       "";
 
 
-    aiStatus.innerHTML =
-      "";
+    aiStatus.innerHTML = `
+      <div class="ai-status">
+        🤖 AI is processing your file...
+      </div>
+    `;
 
 
     const formData =
@@ -83,9 +90,32 @@ fileInput.addEventListener(
         );
 
 
+      // ==========================================
+      // RESPONSE CHECK
+      // ==========================================
+
+      if (!response.ok) {
+
+        throw new Error(
+          `Server returned HTTP ${response.status}`
+        );
+
+      }
+
+
       const result =
         await response.json();
 
+
+      console.log(
+        "Work Minut API Response:",
+        result
+      );
+
+
+      // ==========================================
+      // API FAILURE
+      // ==========================================
 
       if (!result.success) {
 
@@ -95,16 +125,29 @@ fileInput.addEventListener(
 
         resultContent.innerHTML = `
           <div class="error-message">
+
+            <strong>
+              File processing failed
+            </strong>
+
+            <br><br>
+
             ${escapeHTML(
               result.error ||
               "Unable to process file."
             )}
+
           </div>
         `;
+
 
         return;
       }
 
+
+      // ==========================================
+      // SUCCESS
+      // ==========================================
 
       statusText.textContent =
         "Completed";
@@ -114,15 +157,33 @@ fileInput.addEventListener(
         result.data;
 
 
+      console.log(
+        "Extracted Data:",
+        data
+      );
+
+
+      // ==========================================
+      // AI RESULT
+      // ==========================================
+
       displayAI(
         data.ai_extraction
       );
 
 
+      // ==========================================
+      // QUALITY CHECK
+      // ==========================================
+
       displayQuality(
         data.quality_check
       );
 
+
+      // ==========================================
+      // STRUCTURED DATA
+      // ==========================================
 
       displayResult(
         data
@@ -131,31 +192,82 @@ fileInput.addEventListener(
 
     } catch (error) {
 
-      console.error(error);
+      console.error(
+        "Work Minut Error:",
+        error
+      );
 
 
       statusText.textContent =
         "Connection Error";
 
 
-      resultContent.innerHTML = `
-        <div class="error-message">
-          Unable to connect to
-          Work Minut server.
+      aiStatus.innerHTML = `
+        <div class="ai-status ai-disabled">
+
+          ⚠ Work Minut server error
+
+          <br><br>
+
+          <strong>
+            ${escapeHTML(
+              error.message
+            )}
+          </strong>
+
         </div>
       `;
+
+
+      resultContent.innerHTML = `
+        <div class="error-message">
+
+          Unable to complete the request.
+
+          <br><br>
+
+          <strong>
+            ${escapeHTML(
+              error.message
+            )}
+          </strong>
+
+        </div>
+      `;
+
     }
 
   }
 );
 
 
+// ==================================================
+// AI DISPLAY
+// ==================================================
+
 function displayAI(ai) {
 
+  // ----------------------------------------------
+  // No AI response
+  // ----------------------------------------------
+
   if (!ai) {
+
+    aiStatus.innerHTML = `
+      <div class="ai-status ai-disabled">
+
+        ⚠ No AI response received.
+
+      </div>
+    `;
+
     return;
   }
 
+
+  // ----------------------------------------------
+  // AI disabled
+  // ----------------------------------------------
 
   if (!ai.enabled) {
 
@@ -164,19 +276,51 @@ function displayAI(ai) {
 
         ⚠ AI is not configured.
 
+        <br><br>
+
+        ${escapeHTML(
+          ai.message || ""
+        )}
+
       </div>
     `;
 
     return;
   }
 
+
+  // ----------------------------------------------
+  // AI ERROR
+  // ----------------------------------------------
 
   if (ai.error) {
 
     aiStatus.innerHTML = `
       <div class="ai-status ai-disabled">
 
-        AI processing failed.
+        ⚠ AI processing failed.
+
+        <br><br>
+
+        <strong>
+          Actual Error:
+        </strong>
+
+        <br>
+
+        <div style="
+          margin-top:10px;
+          padding:10px;
+          background:#ffffff;
+          border-radius:8px;
+          word-break:break-word;
+        ">
+
+          ${escapeHTML(
+            ai.error
+          )}
+
+        </div>
 
       </div>
     `;
@@ -184,6 +328,10 @@ function displayAI(ai) {
     return;
   }
 
+
+  // ----------------------------------------------
+  // AI SUCCESS
+  // ----------------------------------------------
 
   const score =
     ai.quality_score ?? 0;
@@ -194,10 +342,11 @@ function displayAI(ai) {
 
       🤖 AI Extraction Completed
 
-      &nbsp;
+      <br><br>
 
       <strong>
-        Quality Score: ${score}/100
+        Quality Score:
+        ${score}/100
       </strong>
 
     </div>
@@ -205,14 +354,26 @@ function displayAI(ai) {
 }
 
 
+// ==================================================
+// QUALITY CHECK
+// ==================================================
+
 function displayQuality(
   quality
 ) {
 
   if (!quality) {
+
+    qualityBox.innerHTML =
+      "";
+
     return;
   }
 
+
+  // ----------------------------------------------
+  // PASSED
+  // ----------------------------------------------
 
   if (quality.passed) {
 
@@ -223,8 +384,10 @@ function displayQuality(
           ✓ Quality Check Passed
         </strong>
 
-        <div>
+        <div style="margin-top:6px;">
+
           No missing values detected.
+
         </div>
 
       </div>
@@ -234,16 +397,26 @@ function displayQuality(
   }
 
 
+  // ----------------------------------------------
+  // ISSUES
+  // ----------------------------------------------
+
   let issuesHTML =
     "";
 
 
-  quality.issues.forEach(
+  const issues =
+    quality.issues || [];
+
+
+  issues.forEach(
     issue => {
 
       issuesHTML += `
         <li>
-          ${escapeHTML(issue)}
+          ${escapeHTML(
+            issue
+          )}
         </li>
       `;
 
@@ -255,18 +428,30 @@ function displayQuality(
     <div class="quality-box quality-warning">
 
       <strong>
-        ⚠ ${quality.total_issues}
+
+        ⚠ ${quality.total_issues || issues.length}
         issue(s) detected
+
       </strong>
 
-      <ul>
-        ${issuesHTML}
-      </ul>
+      ${
+        issues.length
+          ? `
+            <ul>
+              ${issuesHTML}
+            </ul>
+          `
+          : ""
+      }
 
     </div>
   `;
 }
 
+
+// ==================================================
+// RESULT DISPLAY
+// ==================================================
 
 function displayResult(
   data
@@ -276,12 +461,16 @@ function displayResult(
     data.ai_extraction;
 
 
+  // ----------------------------------------------
+  // AI STRUCTURED DATA
+  // ----------------------------------------------
+
   if (
     ai &&
     ai.enabled &&
     !ai.error &&
-    ai.columns &&
-    ai.rows
+    Array.isArray(ai.columns) &&
+    Array.isArray(ai.rows)
   ) {
 
     displayTable(
@@ -292,6 +481,10 @@ function displayResult(
     return;
   }
 
+
+  // ----------------------------------------------
+  // ORIGINAL CSV / EXCEL DATA
+  // ----------------------------------------------
 
   if (
     data.file_type === "csv" ||
@@ -306,6 +499,10 @@ function displayResult(
     return;
   }
 
+
+  // ----------------------------------------------
+  // PDF / WORD TEXT
+  // ----------------------------------------------
 
   if (
     data.file_type === "pdf" ||
@@ -324,10 +521,13 @@ function displayResult(
         background:#f8fafc;
         border-radius:10px;
         white-space:pre-wrap;
+        overflow-x:auto;
       ">
+
         ${escapeHTML(
           data.text || ""
         )}
+
       </div>
 
     `;
@@ -336,20 +536,33 @@ function displayResult(
   }
 
 
+  // ----------------------------------------------
+  // UNKNOWN
+  // ----------------------------------------------
+
   resultContent.innerHTML = `
     <div class="error-message">
+
       No structured data found.
+
     </div>
   `;
 }
 
+
+// ==================================================
+// TABLE
+// ==================================================
 
 function displayTable(
   columns,
   rows
 ) {
 
-  if (!columns.length) {
+  if (
+    !columns ||
+    !columns.length
+  ) {
 
     resultContent.innerHTML =
       "<p>No structured data found.</p>";
@@ -369,14 +582,20 @@ function displayTable(
   `;
 
 
+  // ----------------------------------------------
+  // HEADERS
+  // ----------------------------------------------
+
   columns.forEach(
     column => {
 
       table += `
         <th>
+
           ${escapeHTML(
             String(column)
           )}
+
         </th>
       `;
 
@@ -393,7 +612,11 @@ function displayTable(
   `;
 
 
-  rows.forEach(
+  // ----------------------------------------------
+  // ROWS
+  // ----------------------------------------------
+
+  (rows || []).forEach(
     row => {
 
       table += "<tr>";
@@ -408,9 +631,11 @@ function displayTable(
 
           table += `
             <td>
+
               ${escapeHTML(
                 String(value)
               )}
+
             </td>
           `;
 
@@ -438,11 +663,17 @@ function displayTable(
 }
 
 
+// ==================================================
+// HTML SECURITY
+// ==================================================
+
 function escapeHTML(
   value
 ) {
 
-  return String(value)
+  return String(
+    value ?? ""
+  )
 
     .replaceAll(
       "&",
